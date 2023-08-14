@@ -216,6 +216,7 @@ class Process(GameObject):
                     self.view.y -= min(self._ANIMATION_SPEED, self.view.y - self.view.target_y)
                     
         if self._is_waiting_for_page:
+            self._yield_cpu()
             self._display_blink_color = (int(current_time / 200) % 2 == 1)
         else:
             self._display_blink_color = False

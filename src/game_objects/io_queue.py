@@ -1,3 +1,4 @@
+import asyncio
 from queue import SimpleQueue
 from random import randint
 
@@ -31,6 +32,10 @@ class IoQueue(GameObject):
             callback = self._subscriber_queue.get()
             callback()
 
+    async def _awaitAndClick(self):
+        await asyncio.sleep(0.2)
+        self._onClick()
+
     def update(self, current_time, events):
         for event in events:
             if self._checkIfClickedOn(event):
@@ -41,3 +46,4 @@ class IoQueue(GameObject):
 
             if self._event_count < self._subscriber_queue.qsize() and randint(1, 3) == 3:
                 self._event_count = randint(self._event_count + 1, self._subscriber_queue.qsize())
+                asyncio.create_task(self._awaitAndClick())

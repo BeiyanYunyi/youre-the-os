@@ -32,7 +32,11 @@ class Page(GameObject):
     @in_use.setter
     def in_use(self, value):
         self._in_use = value
-    
+        if(value and self._in_swap):
+            self._on_click()
+        if(not value and not self._in_swap):
+            self._on_click()
+
     def _check_if_clicked_on(self, event):
         if event.type == GameEventType.MOUSE_LEFT_CLICK or GameEventType.MOUSE_LEFT_DRAG:
             return self._view.collides(*event.getProperty('position'))

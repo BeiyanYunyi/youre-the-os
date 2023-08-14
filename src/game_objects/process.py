@@ -134,6 +134,9 @@ class Process(GameObject):
             self._set_waiting_for_io(False)
             self._set_waiting_for_page(False)
             self._starvation_level = 0
+            self.view.target_y = -self.view.height
+            for page in self._pages:
+                self._page_manager.delete_page(page)
 
     def _terminate_by_user(self):
         if self._process_manager.terminate_process(self, True):
@@ -176,6 +179,7 @@ class Process(GameObject):
                 if self.has_cpu and not self.is_blocked:
                     if randint(1, 100) <= self._io_probability_numerator:
                         self._wait_for_io()
+                        self._yield_cpu()
                     if len(self._pages) < 4 and randint(1, 20) == 1:
                         new_page = self._page_manager.create_page(self._pid)
                         self._pages.append(new_page)
@@ -184,6 +188,7 @@ class Process(GameObject):
                         self._terminate_gracefully()
                     elif self._current_state_duration == 5:
                         self._starvation_level = 0
+                        self._yield_cpu()
 
                 else:
                     if self._current_state_duration > 0 and self._current_state_duration % 10 == 0:

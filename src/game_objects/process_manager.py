@@ -150,6 +150,12 @@ class ProcessManager(GameObject):
 
         if can_terminate:
             self._alive_process_list.remove(process)
+            for cpu in self._cpu_list:
+                if cpu.process == process:
+                    cpu.process = None
+            for process_slot in self._process_slots:
+                if process_slot.process == process:
+                    process_slot.process = None
 
         return can_terminate
     
@@ -173,6 +179,24 @@ class ProcessManager(GameObject):
             'gracefully_terminated_process_count': self._gracefully_terminated_process_count,
             'user_terminated_process_count': self._user_terminated_process_count,
         }     
+    
+    def _allocate_cpu(self):
+        max_starvation_level = 0
+        for process_slot in self._process_slots:
+            proc = process_slot.process
+            if proc is not None and proc.starvation_level > max_starvation_level and not proc._is_waiting_for_io:
+                max_starvation_level = proc.starvation_level
+        for process_slot in self._process_slots:
+            proc = process_slot.process
+            if proc is not None and proc.starvation_level == max_starvation_level and not proc._is_waiting_for_io:
+                proc._use_cpu()
+                break
+
+    def _has_unused_cpu(self):
+        for cpu in self._cpu_list:
+            if cpu.process is None:
+                return True
+        return False
 
     def update(self, current_time, events):
         if self._user_terminated_process_count == self.MAX_TERMINATED_BY_USER:
@@ -203,4 +227,6 @@ class ProcessManager(GameObject):
             game_object.update(current_time, events)
             if isinstance(game_object, Process) and game_object.has_ended and game_object.view.y <= -game_object.view.height:
                 self.children.remove(game_object)
-                
+        
+        if self._has_unused_cpu():
+            self._allocate_cpu()

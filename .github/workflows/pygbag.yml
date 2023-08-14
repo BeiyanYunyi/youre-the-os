@@ -1,7 +1,16 @@
 
 name: pygbag_build
-on: [workflow_dispatch]
+on: 
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  deployments: write
 
 jobs:
   build-pygbag:
@@ -18,8 +27,15 @@ jobs:
       uses: VaultVulp/action-pipenv@v2.0.1
       with:
         command:  run web build
-    - name : "Upload to GitHub pages branch gh-pages"
-      uses: JamesIves/github-pages-deploy-action@4.1.7
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
       with:
-        branch: gh-pages
-        folder: src/build/web
+        path: 'src/build/web'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@main
+    #- name : "Upload to GitHub pages branch gh-pages"
+    #  uses: JamesIves/github-pages-deploy-action@4.1.7
+    #  with:
+    #    branch: gh-pages
+    #    folder: src/build/web

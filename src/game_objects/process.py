@@ -197,6 +197,10 @@ class Process(GameObject):
                         else:
                             self._terminate_by_user()
 
+            if self._has_cpu and self._page_manager.is_oom() and not self.is_blocked:
+                print("oom")
+                self._terminate_gracefully()
+
         if self.view.target_x is not None:
             if self.view.x == self.view.target_x:
                 self.view.target_x = None

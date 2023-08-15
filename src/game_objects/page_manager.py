@@ -123,3 +123,12 @@ class PageManager(GameObject):
         for ram_slot in self._ram_slots:
             if ram_slot.has_page and not ram_slot.page.in_use:
                 self.swap_page(ram_slot.page)
+
+    def is_oom(self):
+        for ram_slot in self._ram_slots:
+            if not ram_slot.has_page:
+                return False
+        for swap_slot in self._swap_slots:
+            if not swap_slot.has_page:
+                return False
+        return True

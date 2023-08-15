@@ -181,7 +181,7 @@ class ProcessManager(GameObject):
         }     
     
     def _allocate_cpu(self):
-        max_starvation_level = 0
+        max_starvation_level = 1
         for process_slot in self._process_slots:
             proc = process_slot.process
             if proc is not None and proc.starvation_level > max_starvation_level and not proc._is_waiting_for_io:
@@ -230,3 +230,4 @@ class ProcessManager(GameObject):
         
         if self._has_unused_cpu():
             self._allocate_cpu()
+            self._game.page_manager.clean_ram()

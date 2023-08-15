@@ -118,3 +118,8 @@ class PageManager(GameObject):
                 ram_slot.page = None
                 break
         self.children.remove(page)
+    
+    def clean_ram(self):
+        for ram_slot in self._ram_slots:
+            if ram_slot.has_page and not ram_slot.page.in_use:
+                self.swap_page(ram_slot.page)
